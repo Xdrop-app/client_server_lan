@@ -1,0 +1,34 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Current Device",
+            "type": "dart",
+            "request": "launch",
+            "program": "example/lib/main.dart"
+        },
+        {
+            "name": "Honor",
+            "type": "dart",
+            "request": "launch",
+            "program": "example/lib/main.dart",
+            "deviceId": "STF L09"
+        },
+        {
+            "name": "Moto",
+            "type": "dart",
+            "request": "launch",
+            "program": "example/lib/main.dart",
+            "deviceId": "MotoG3"
+        }
+    ],
+    "compounds": [
+        {
+            "name": "All Devices",
+            "configurations": ["Honor","Moto"],
+        }
+    ]
+}
