@@ -2,9 +2,15 @@ part of 'basenode.dart';
 
 class ConnectedClientNode {
   ConnectedClientNode(
-      {@required this.name, @required this.address, this.lastSeen});
+      {@required this.name,
+      @required this.address,
+      this.lastSeen,
+      this.platform,
+      this.version});
 
   final String name;
+  final String platform;
+  final int version;
   final String address;
   DateTime lastSeen;
 }

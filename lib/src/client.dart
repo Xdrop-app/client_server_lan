@@ -84,6 +84,8 @@ abstract class _BaseClientNode with _BaseNode {
       _server = ConnectedClientNode(
           address: "${data["host"]}:${data["port"]}",
           name: data["name"].toString(),
+          platform: data['platform'].toString(),
+          version: data['version'],
           lastSeen: DateTime.now());
       if (verbose) {
         print(
