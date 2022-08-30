@@ -3,7 +3,12 @@ part of 'basenode.dart';
 /// The Node for if the device is to act as a client (i.e wait for server to connect to it). It can only communicate with the server. Additional work needs to be added in order to facilitate data forwarding.
 class ClientNode extends _BaseClientNode {
   ClientNode(
-      {@required this.name, this.host, this.port = 8084, this.verbose = false})
+      {@required this.name,
+      this.host,
+      this.port = 8084,
+      this.verbose = false,
+      this.platform,
+      this.version})
       : assert(name != null) {
     if (Platform.isAndroid || Platform.isIOS) {
       if (host == null) {
@@ -15,6 +20,14 @@ class ClientNode extends _BaseClientNode {
   /// The name of the node on the network
   @override
   String name;
+
+  /// The name of the node on the network
+  @override
+  String platform;
+
+  /// The IP address of the device
+  @override
+  int version;
 
   /// The IP address of the device
   @override
