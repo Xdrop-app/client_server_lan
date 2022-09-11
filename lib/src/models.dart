@@ -22,12 +22,14 @@ class DataPacket {
       @required this.host,
       @required this.port,
       @required this.title,
+      @required this.platform,
       this.payload});
 
   DataPacket.fromJson(Map<String, dynamic> json)
       : this.host = json["host"],
         this.port = int.parse(json["port"]),
         this.name = json["name"],
+        this.platform = json["platform"],
         this.title = json["title"],
         this.payload = json["payload"];
 
@@ -40,6 +42,8 @@ class DataPacket {
   /// The name of the sender
   final String name;
 
+  final String platform;
+
   /// The title of the packet
   final String title;
 
@@ -48,7 +52,7 @@ class DataPacket {
 
   /// Encodes the packet data into a json ready for transmitting
   String encodeToString() =>
-      '{"host":"$host", "port": "$port", "name": "$name", "title": "$title", "payload": "$payload"}';
+      '{"host":"$host", "port": "$port", "name": "$name", "platform": "$platform", "title": "$title", "payload": "$payload"}';
 
   @override
   String toString() => encodeToString();

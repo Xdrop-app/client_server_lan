@@ -3,7 +3,11 @@ part of 'basenode.dart';
 /// The Node for if the device is to act as a server (i.e connect to all the clients). It can communicate with all the clients it's connected to.
 class ServerNode extends _BaseServerNode {
   ServerNode(
-      {@required this.name, this.host, this.port = 8084, this.verbose = false})
+      {@required this.name,
+      this.host,
+      this.port = 8084,
+      this.verbose = false,
+      this.platform})
       : assert(name != null) {
     if (Platform.isAndroid || Platform.isIOS) {
       if (host == null) {
@@ -15,6 +19,9 @@ class ServerNode extends _BaseServerNode {
   /// The name of the node on the network
   @override
   String name;
+
+  @override
+  String platform;
 
   /// The IP address of the device
   @override
@@ -81,9 +88,13 @@ abstract class _BaseServerNode with _BaseNode {
     assert(host != null);
     assert(_isServer);
     await _socketReady.future;
-    final payload =
-        DataPacket(host: host, port: port, name: name, title: "client_connect")
-            .encodeToString();
+    final payload = DataPacket(
+            host: host,
+            port: port,
+            name: name,
+            title: "client_connect",
+            platform: platform)
+        .encodeToString();
     final data = utf8.encode(payload);
     String broadcastAddr;
     final l = host.split(".");

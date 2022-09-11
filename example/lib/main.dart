@@ -123,7 +123,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void dispose() {
     dropdownEnabled
-        ? dropdownValue == "Server" ? disposeServer() : disposeClient()
+        ? dropdownValue == "Server"
+            ? disposeServer()
+            : disposeClient()
         : print("Disposing");
     super.dispose();
   }

@@ -26,6 +26,7 @@ const String _suffix = "/cmd";
 
 abstract class _BaseNode {
   String _name;
+  String _platform;
   String _host;
   int _port;
   IsoHttpd _iso;
@@ -61,6 +62,8 @@ abstract class _BaseNode {
 
   /// The String chosen as the name of the Node
   get name => _name;
+
+  get platform => _platform;
 
   /// The Port of the Node
   get port => _port;
@@ -111,6 +114,7 @@ abstract class _BaseNode {
         if (data.title == "client_connect") {
           final client = ConnectedClientNode(
               name: data.name,
+              platform: data.platform,
               address: "${data.host}:${data.port}",
               lastSeen: DateTime.now());
           //check client not the same as currently in database if so update current client
@@ -125,7 +129,7 @@ abstract class _BaseNode {
           }
           if (verbose) {
             _.state(
-                "Client ${data.name} connected at ${data.host}:${data.port}");
+                "Client ${data.name} connected at ${data.host}:${data.port} and platform ${data.platform}");
           }
         } else {
           if (data.payload != "null") {
@@ -198,7 +202,12 @@ abstract class _BaseNode {
     final uri = "http://$to$endPoint";
     Response response;
     final packet = DataPacket(
-        host: host, port: port, name: name, title: title, payload: data);
+        host: host,
+        port: port,
+        name: name,
+        platform: platform,
+        title: title,
+        payload: data);
     try {
       response = await _dio.post<dynamic>(uri, data: packet.encodeToString());
     } on DioError catch (e) {
