@@ -224,10 +224,10 @@ abstract class _BaseNode {
   }
 
   /// To be run when the HTTP Server is no longer required
-  void dispose() {
-    _dataResponce.close();
-    _socket.close();
-    iso.kill();
+  Future<void> dispose() async{
+    await _dataResponce.close();
+    await _socket.close();
+    await iso.kill();
     if (verbose) {
       print(_isServer ? "Server Disposed" : "Client Disposed");
     }
