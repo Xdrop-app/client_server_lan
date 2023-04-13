@@ -53,11 +53,9 @@ packages:
   isohttpd:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "55c4aacf21d4e0da335a24fbe9eeb6a9d5cf39d1"
-      url: "https://github.com/Xdrop-app/isohttpd.git"
-    source: git
+      path: "../isohttpd"
+      relative: true
+    source: path
     version: "0.5.0"
   meta:
     dependency: "direct main"

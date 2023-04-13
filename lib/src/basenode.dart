@@ -69,7 +69,7 @@ abstract class _BaseNode {
   get port => _port;
 
   /// The http server used for data transmission
-  get iso => _iso;
+  IsoHttpd get iso => _iso;
 
   Future<void> _initNode(String _h, bool isServer,
       {@required bool start}) async {
@@ -193,6 +193,7 @@ abstract class _BaseNode {
     if (response == null || response.statusCode != HttpStatus.ok) {
       final ecode = response?.statusCode ?? _e.noResponse;
       _.warning("Error sending the info response: $ecode");
+      await _sendData('errorSending', null, to, _suffix);
     }
   }
 
@@ -224,10 +225,19 @@ abstract class _BaseNode {
   }
 
   /// To be run when the HTTP Server is no longer required
-  Future<void> dispose() async{
-    await _dataResponce.close();
-    await _socket.close();
-    await iso.kill();
+  Future<void> dispose() async {
+    try {
+      print("DISPOSE1");
+      await iso.kill();
+    } catch (e) {}
+    try {
+      await _socket.close();
+    } catch (e) {}
+    try {
+      if (await _dataResponce.hasListener) {
+        await _dataResponce.close();
+      }
+    } catch (e) {}
     if (verbose) {
       print(_isServer ? "Server Disposed" : "Client Disposed");
     }
