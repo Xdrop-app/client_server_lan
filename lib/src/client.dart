@@ -3,13 +3,12 @@ part of 'basenode.dart';
 /// The Node for if the device is to act as a client (i.e wait for server to connect to it). It can only communicate with the server. Additional work needs to be added in order to facilitate data forwarding.
 class ClientNode extends _BaseClientNode {
   ClientNode(
-      {@required this.name,
+      {required this.name,
       this.host,
       this.port = 8084,
       this.verbose = false,
       this.platform,
-      this.version})
-      : assert(name != null) {
+      this.version}) {
     if (Platform.isAndroid || Platform.isIOS) {
       if (host == null) {
         throw ArgumentError("Please provide a host");
@@ -17,21 +16,20 @@ class ClientNode extends _BaseClientNode {
     }
   }
 
-  /// The name of the node on the network
   @override
   String name;
 
   /// The name of the node on the network
   @override
-  String platform;
+  String? platform;
 
   /// The IP address of the device
   @override
-  int version;
+  int? version;
 
   /// The IP address of the device
   @override
-  String host;
+  String? host;
 
   /// The Port to use for communication
   @override
@@ -42,24 +40,26 @@ class ClientNode extends _BaseClientNode {
   bool verbose;
 
   /// Used to setup the Node ready for use
-  Future<void> init({String ip, bool start = true}) async {
+  Future<void> init({String? ip, bool start = true}) async {
     ip ??= host;
     ip ??= await _getHost();
-    await _initClientNode(ip, start: start);
+    if (ip != null) {
+      await _initClientNode(ip, start: start);
+    }
   }
 }
 
-abstract class _BaseClientNode with _BaseNode {
-  BaseClientNode() {
+abstract class _BaseClientNode extends _BaseNode {
+  _BaseClientNode() {
     _isServer = false;
   }
 
-  ConnectedClientNode _server;
+  ConnectedClientNode? _server;
 
   /// Provides information about the server if one is connected
-  ConnectedClientNode get serverDetails => _server;
+  ConnectedClientNode? get serverDetails => _server;
 
-  Future<void> _initClientNode(String host, {@required bool start}) async {
+  Future<void> _initClientNode(String host, {required bool start}) async {
     await _initNode(host, false, start: start);
     await _listenForDiscovery();
     if (verbose) {

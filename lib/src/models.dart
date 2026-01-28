@@ -2,27 +2,27 @@ part of 'basenode.dart';
 
 class ConnectedClientNode {
   ConnectedClientNode(
-      {@required this.name,
-      @required this.address,
+      {required this.name,
+      required this.address,
       this.lastSeen,
       this.platform,
       this.version});
 
   final String name;
-  final String platform;
-  final int version;
+  final String? platform;
+  final int? version;
   final String address;
-  DateTime lastSeen;
+  DateTime? lastSeen;
 }
 
 /// The type of data that is sent and received. It includes all the neccessary information for that specific communication. The most useful data is the payload, then packet title and the name/host of the sender.
 class DataPacket {
   DataPacket(
-      {@required this.name,
-      @required this.host,
-      @required this.port,
-      @required this.title,
-      @required this.platform,
+      {required this.name,
+      required this.host,
+      required this.port,
+      required this.title,
+      required this.platform,
       this.payload});
 
   DataPacket.fromJson(Map<String, dynamic> json)

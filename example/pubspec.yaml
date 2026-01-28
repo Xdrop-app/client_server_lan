@@ -18,7 +18,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ^3.5.4
 
 dependencies:
   flutter:
@@ -27,11 +27,12 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  wifi: ^0.1.5
+  wifi_iot: ^0.3.18
   client_server_lan:
     path: ../
-  cupertino_icons: ^0.1.3
-  isohttpd: ^0.4.0
+  cupertino_icons: ^1.0.0
+  isohttpd:
+    path: ../../isohttpd
 
 dev_dependencies:
   flutter_test:

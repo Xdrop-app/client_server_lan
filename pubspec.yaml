@@ -4,7 +4,7 @@ version: 1.1.0
 homepage: https://github.com/Robert3141/client_server_lan
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ^3.5.4
 
 dependencies:
   dio: 

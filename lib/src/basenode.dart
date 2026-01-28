@@ -25,25 +25,27 @@ class _e {
 const String _suffix = "/cmd";
 
 abstract class _BaseNode {
-  String _name;
-  String _platform;
-  String _host;
-  int _port;
-  IsoHttpd _iso;
-  RawDatagramSocket _socket;
-  bool _isServer;
-  int _socketPort;
+  late String _name;
+  late String _platform;
+  late String _host;
+  late int _port;
+  late IsoHttpd _iso;
+  late RawDatagramSocket _socket;
+  late bool _isServer;
+  int? _socketPort;
   bool _isRunning = false;
 
   final Completer<void> _socketReady = Completer<void>();
   final List<ConnectedClientNode> _clients = <ConnectedClientNode>[];
-  final Dio _dio = Dio(BaseOptions(connectTimeout: 5000, receiveTimeout: 3000));
+  final Dio _dio = Dio(BaseOptions(
+      connectTimeout: const Duration(milliseconds: 5000),
+      receiveTimeout: const Duration(milliseconds: 3000)));
   final Completer _readyCompleter = Completer<void>();
   final StreamController<DataPacket> _dataResponce =
       StreamController<DataPacket>.broadcast();
 
   /// Debug print outputs of the data being received or sent. This is primarily for use in the debug development phase
-  bool verbose;
+  bool verbose = false;
 
   /// The way to access the status of the HTTP Listener
   void status() => iso.status();
@@ -72,7 +74,7 @@ abstract class _BaseNode {
   IsoHttpd get iso => _iso;
 
   Future<void> _initNode(String _h, bool isServer,
-      {@required bool start}) async {
+      {required bool start}) async {
     _host = _h;
     _isServer = isServer;
     //socket port
@@ -164,7 +166,8 @@ abstract class _BaseNode {
     if (verbose) {
       print("Intializing for discovery on $host:$port");
     }
-    _socket = await RawDatagramSocket.bind(InternetAddress.anyIPv4, _socketPort)
+    _socket = await RawDatagramSocket.bind(
+        InternetAddress.anyIPv4, _socketPort ?? 9104)
       ..broadcastEnabled = true;
     if (verbose) {
       print("Socket is ready at ${_socket.address.host}:$_socketPort");
@@ -197,11 +200,10 @@ abstract class _BaseNode {
     }
   }
 
-  Future<Response> _sendData(
+  Future<Response?> _sendData(
       String title, dynamic data, String to, String endPoint) async {
-    assert(to != null);
     final uri = "http://$to$endPoint";
-    Response response;
+    Response? response;
     final packet = DataPacket(
         host: host,
         port: port,
@@ -228,10 +230,10 @@ abstract class _BaseNode {
   Future<void> dispose() async {
     try {
       print("DISPOSE1");
-      await iso.kill();
+      iso.kill();
     } catch (e) {}
     try {
-      await _socket.close();
+      _socket.close();
     } catch (e) {}
     try {
       if (await _dataResponce.hasListener) {
