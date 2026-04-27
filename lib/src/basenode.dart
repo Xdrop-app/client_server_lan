@@ -112,12 +112,12 @@ abstract class _BaseNode {
   void _listenToIso() {
     iso.logs.listen((dynamic data) async {
       if (data is Map<String, dynamic>) {
-        data = DataPacket.fromJson(data);
-        if (data.title == "client_connect") {
+        final packet = DataPacket.fromJson(data);
+        if (packet.title == "client_connect") {
           final client = ConnectedClientNode(
-              name: data.name,
-              platform: data.platform,
-              address: "${data.host}:${data.port}",
+              name: packet.name,
+              platform: packet.platform,
+              address: "${packet.host}:${packet.port}",
               lastSeen: DateTime.now());
           //check client not the same as currently in database if so update current client
           if (_clients.any((element) => element.address == client.address)) {
@@ -131,15 +131,17 @@ abstract class _BaseNode {
           }
           if (verbose) {
             _.state(
-                "Client ${data.name} connected at ${data.host}:${data.port} and platform ${data.platform}");
+                "Client ${packet.name} connected at ${packet.host}:${packet.port} and platform ${packet.platform}");
           }
         } else {
-          if (data.payload != "null") {
-            _dataResponce.sink.add(data);
+          if (packet.payload != "null") {
+            _.data("Recieved Packet: ${packet.name} : ${packet.payload}");
+            _dataResponce.sink.add(packet);
           } else if (verbose) {
-            print("Empty packet recieved from ${data.host}:${data.port}");
+            print("Empty packet recieved from ${packet.host}:${packet.port}");
           }
         }
+        return;
       }
       if (data is String) {
         //data is message about server

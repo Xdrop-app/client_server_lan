@@ -27,7 +27,9 @@ class DataPacket {
 
   DataPacket.fromJson(Map<String, dynamic> json)
       : this.host = json["host"],
-        this.port = int.parse(json["port"]),
+        this.port = json["port"] is int
+            ? json["port"] as int
+            : int.parse(json["port"].toString()),
         this.name = json["name"],
         this.platform = json["platform"],
         this.title = json["title"],
