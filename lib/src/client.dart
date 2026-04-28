@@ -24,7 +24,6 @@ class ClientNode extends _BaseClientNode {
   String? platform;
 
   /// The IP address of the device
-  @override
   int? version;
 
   /// The IP address of the device
@@ -43,9 +42,7 @@ class ClientNode extends _BaseClientNode {
   Future<void> init({String? ip, bool start = true}) async {
     ip ??= host;
     ip ??= await _getHost();
-    if (ip != null) {
-      await _initClientNode(ip, start: start);
-    }
+    await _initClientNode(ip, start: start);
   }
 }
 
@@ -69,7 +66,6 @@ abstract class _BaseClientNode extends _BaseNode {
   }
 
   Future<void> _listenForDiscovery() async {
-    assert(_socket != null);
     await _socketReady.future;
     if (verbose) {
       print("Listening on socket ${_socket.address.host}:$_socketPort");
@@ -79,20 +75,69 @@ abstract class _BaseClientNode extends _BaseNode {
       if (d == null) {
         return;
       }
-      final message = utf8.decode(d.data).trim();
-      final dynamic data = json.decode(message);
+      final data = _parseDiscoveryPacket(d.data);
+      if (data == null) {
+        return;
+      }
       _server = ConnectedClientNode(
-          address: "${data["host"]}:${data["port"]}",
-          name: data["name"].toString(),
-          platform: data['platform'].toString(),
-          version: data['version'],
+          address: lanAuthority(data.host, data.port),
+          name: data.name,
+          platform: data.platform,
+          version: data.version,
           lastSeen: DateTime.now());
       if (verbose) {
         print(
-            "Recieved connection request from Client ${data["host"]}:${data["port"]}");
+            "Recieved connection request from Client ${data.host}:${data.port}");
       }
-      final String addr = "${data["host"]}:${data["port"]}";
+      final String addr = lanAuthority(data.host, data.port);
       await _sendInfo("client_connect", addr);
     });
   }
+
+  _DiscoveryPacket? _parseDiscoveryPacket(List<int> data) {
+    dynamic decoded;
+    try {
+      decoded = json.decode(utf8.decode(data).trim());
+    } catch (e) {
+      if (verbose) {
+        print("Ignoring malformed discovery packet: $e");
+      }
+      return null;
+    }
+
+    if (decoded is! Map<String, dynamic>) return null;
+    if (decoded['title'] != 'client_connect') return null;
+
+    final host = decoded['host']?.toString();
+    final port = decoded['port'] is int
+        ? decoded['port'] as int
+        : int.tryParse(decoded['port']?.toString() ?? '');
+    if (host == null || host.isEmpty || port == null) return null;
+
+    return _DiscoveryPacket(
+      host: host,
+      port: port,
+      name: decoded['name']?.toString() ?? '',
+      platform: decoded['platform']?.toString(),
+      version: decoded['version'] is int
+          ? decoded['version'] as int
+          : int.tryParse(decoded['version']?.toString() ?? ''),
+    );
+  }
+}
+
+class _DiscoveryPacket {
+  _DiscoveryPacket({
+    required this.host,
+    required this.port,
+    required this.name,
+    this.platform,
+    this.version,
+  });
+
+  final String host;
+  final int port;
+  final String name;
+  final String? platform;
+  final int? version;
 }

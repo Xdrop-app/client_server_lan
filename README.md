@@ -43,11 +43,12 @@ import 'package:wifi/wifi.dart';
 import 'package:client_server_lan/client_server_lan.dart';
 void startServer() async {
     String ip = await Wifi.ip;
+    final commandPort = await getAvailableLanPort(ip);
     server = ServerNode(
       name: "Server",
       verbose: true,
       host: ip,
-      port: 8085,
+      port: commandPort,
     );
     await server.init();
     await server.onReady;
@@ -67,11 +68,12 @@ Start a Client Node
 void startClient() async {
     dropdownEnabled = false;
     String ip = await Wifi.ip;
+    final commandPort = await getAvailableLanPort(ip);
     client = ClientNode(
       name: "Client Node",
       verbose: true,
       host: ip,
-      port: 8085,
+      port: commandPort,
     );
     await client.init();
     await client.onReady;

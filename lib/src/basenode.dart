@@ -4,7 +4,6 @@ import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:isohttpd/isohttpd.dart';
-import 'package:meta/meta.dart';
 import 'package:emodebug/emodebug.dart';
 
 part 'server.dart';
@@ -117,7 +116,7 @@ abstract class _BaseNode {
           final client = ConnectedClientNode(
               name: packet.name,
               platform: packet.platform,
-              address: "${packet.host}:${packet.port}",
+              address: lanAuthority(packet.host, packet.port),
               lastSeen: DateTime.now());
           //check client not the same as currently in database if so update current client
           if (_clients.any((element) => element.address == client.address)) {
@@ -169,7 +168,7 @@ abstract class _BaseNode {
       print("Intializing for discovery on $host:$port");
     }
     _socket = await RawDatagramSocket.bind(
-        InternetAddress.anyIPv4, _socketPort ?? 9104)
+        _discoveryBindAddress(host), _socketPort ?? 9104)
       ..broadcastEnabled = true;
     if (verbose) {
       print("Socket is ready at ${_socket.address.host}:$_socketPort");
@@ -181,7 +180,6 @@ abstract class _BaseNode {
 
   /// The method to transmit to another Node on the network. The data is transferred over LAN.
   Future<void> sendData(String title, dynamic data, String to) async {
-    assert(to != null);
     assert(data != null);
     if (verbose) {
       _.smallArrowOut("Sending data $data to $to");
@@ -204,7 +202,7 @@ abstract class _BaseNode {
 
   Future<Response?> _sendData(
       String title, dynamic data, String to, String endPoint) async {
-    final uri = "http://$to$endPoint";
+    final uri = lanHttpUri(to, endPoint).toString();
     Response? response;
     final packet = DataPacket(
         host: host,
@@ -215,7 +213,7 @@ abstract class _BaseNode {
         payload: data);
     try {
       response = await _dio.post<dynamic>(uri, data: packet.encodeToString());
-    } on DioError catch (e) {
+    } on DioException catch (e) {
       if (e.response != null) {
         _.error(e, _e.httpResponse);
         return response;
@@ -246,4 +244,12 @@ abstract class _BaseNode {
       print(_isServer ? "Server Disposed" : "Client Disposed");
     }
   }
+}
+
+InternetAddress _discoveryBindAddress(String host) {
+  final address = InternetAddress.tryParse(host);
+  if (address?.type == InternetAddressType.IPv6) {
+    return InternetAddress.anyIPv6;
+  }
+  return InternetAddress.anyIPv4;
 }
